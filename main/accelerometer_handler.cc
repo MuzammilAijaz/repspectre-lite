@@ -23,11 +23,14 @@ limitations under the License.
 ==============================================================================*/
 
 #include "accelerometer_handler.h"
+#include "sensor_data.h"
 
 // Variables for Accel and Gyro 
-MPU_t MPU;         // create an object
-mpud::raw_axes_t accelRaw;     // holds x, y, z axes as int16
-mpud::float_axes_t accelG; 
+// MPU_t MPU;         // create an object
+// mpud::raw_axes_t accelRaw;     // holds x, y, z axes as int16
+// mpud::float_axes_t accelG; 
+
+struct SensorData accelRaw = {0.0f, 0.0f, 0.0f, 0.0f};
 
 // Buffer to hold the last 200 sets of 3-channel values
 float save_data[600] = {0.0};
@@ -38,14 +41,17 @@ bool pending_intial_data = true;
 // |                                 Functions
 // =====================================================================================
 
+// REFACTOR: NOT USED -> REMOVEEE!!!!!!!!!
 TfLiteStatus SetupAccelerometer() {
   setupMpuSensor();
   return kTfLiteOk;
 }
 
-//* ================== Get accelerometer data ==================
+// ================== Get accelerometer data ==================
 /** Fills amount of data requested for, in the input array, and 
- * returns : false if new data is not complete, true if new data is retrieved */
+ * returns : 
+ *  -> false if new data is not complete,
+ *  -> true if new data is retrieved */
 bool ReadAccelerometer(float* input, int length, bool reset_buffer) {
   if (reset_buffer) {
     memset(save_data, 0, 600 * sizeof(float)); 
@@ -53,17 +59,23 @@ bool ReadAccelerometer(float* input, int length, bool reset_buffer) {
     pending_intial_data = true;
   }
 
-  // Try to read once
-  if (MPU.acceleration(&accelRaw) != ESP_OK) {  
-    return false;  // no data available
-  }
+  accelRaw = get_sensor_data(SensorValue::RAW_ACCELERATION);
 
-  accelG = mpud::accelGravity(accelRaw, mpud::ACCEL_FS_4G);
+//  // Try to read once
+//  if (MPU.acceleration(&accelRaw) != ESP_OK) {  
+//    return false;  // no data available
+//  }
+//
+//  accelG = mpud::accelGravity(accelRaw, mpud::ACCEL_FS_4G);
+//
+//  // Store into circular buffer
+//  save_data[begin_index++] = accelG.x * 1000;
+//  save_data[begin_index++] = accelG.y * 1000;
+//  save_data[begin_index++] = accelG.z * 1000;
 
-  // Store into circular buffer
-  save_data[begin_index++] = accelG.x * 1000;
-  save_data[begin_index++] = accelG.y * 1000;
-  save_data[begin_index++] = accelG.z * 1000;
+  save_data[begin_index++] = accelRaw.x * 1000;
+  save_data[begin_index++] = accelRaw.y * 1000;
+  save_data[begin_index++] = accelRaw.z * 1000;
 
   if (begin_index >= 600) {
     begin_index = 0;
@@ -90,18 +102,18 @@ bool ReadAccelerometer(float* input, int length, bool reset_buffer) {
   return true; // successfully got new data
 }
 
-void setupMpuSensor() {
-  
-  i2c0.begin(I2C_MPU_SDA, I2C_MPU_SCL, 400000);  // initialize the I2C bus
-
-  MPU.setBus(i2c0);  // set communication bus, for SPI -> pass 'hspi'
-  MPU.setAddr(mpud::MPU_I2CADDRESS_AD0_LOW);  // set address or handle, for SPI -> pass 'mpu_spi_handle'
-  MPU.testConnection();  // test connection with the chip, return is a error code
-  MPU.initialize();  // this will initialize the chip and set default configurations
-
-  MPU.setSampleRate(25);  // in (Hz) ; !!! required for the model
-  MPU.setAccelFullScale(mpud::ACCEL_FS_4G);
-  MPU.setGyroFullScale(mpud::GYRO_FS_500DPS);
-  MPU.setDigitalLowPassFilter(mpud::DLPF_42HZ);  // smoother data
-  MPU.setInterruptEnabled(mpud::INT_EN_RAWDATA_READY);  // enable INT pin
-}
+//void setupMpuSensor() {
+//  
+//  i2c0.begin(I2C_MPU_SDA, I2C_MPU_SCL, 400000);  // initialize the I2C bus
+//
+//  MPU.setBus(i2c0);  // set communication bus, for SPI -> pass 'hspi'
+//  MPU.setAddr(mpud::MPU_I2CADDRESS_AD0_LOW);  // set address or handle, for SPI -> pass 'mpu_spi_handle'
+//  MPU.testConnection();  // test connection with the chip, return is a error code
+//  MPU.initialize();  // this will initialize the chip and set default configurations
+//
+//  MPU.setSampleRate(25);  // in (Hz) ; !!! required for the model
+//  MPU.setAccelFullScale(mpud::ACCEL_FS_4G);
+//  MPU.setGyroFullScale(mpud::GYRO_FS_500DPS);
+//  MPU.setDigitalLowPassFilter(mpud::DLPF_42HZ);  // smoother data
+//  MPU.setInterruptEnabled(mpud::INT_EN_RAWDATA_READY);  // enable INT pin
+//}

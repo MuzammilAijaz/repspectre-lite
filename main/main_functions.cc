@@ -44,6 +44,8 @@ namespace {
 
 // The name of this function is important for Arduino compatibility.
 void setup() {
+  printf("Inside tflite Setup");
+
   // Map the model into a usable data structure. This doesn't involve any
   // copying or parsing, it's a very lightweight operation.
   model = tflite::GetModel(g_magic_wand_model_data);
@@ -82,10 +84,12 @@ void setup() {
   static tflite::MicroInterpreter static_interpreter(
       model, micro_op_resolver, tensor_arena, kTensorArenaSize);
   interpreter = &static_interpreter;
+  printf("Created interpreter");
 
   // Allocate memory from the tensor_arena for the model's tensors
   interpreter->AllocateTensors();
 
+  printf("Allocated Tensors");
   // Obtain pointer to the model's input tensor
   model_input = interpreter->input(0);
   if ((model_input->dims->size != 4) || (model_input->dims->data[0] != 1) ||
@@ -98,10 +102,11 @@ void setup() {
 
   input_length = model_input->bytes / sizeof(float);
 
-  TfLiteStatus setup_status = SetupAccelerometer();
-  if (setup_status != kTfLiteOk) {
-    MicroPrintf("Set up failed\n");
-  }
+//  MPU is already setup at the start 
+//  TfLiteStatus setup_status = SetupAccelerometer();
+//  if (setup_status != kTfLiteOk) {
+//    MicroPrintf("Set up failed\n");
+//  }
 }
 
 void loop() {
@@ -110,8 +115,10 @@ void loop() {
                                     input_length, should_clear_buffer);
   // Don't try to clear the buffer again
   should_clear_buffer = false;
+
   // If there was no new data, wait until next time
-  if (!got_data) return;
+  if (!got_data) {printf("early exit");return;}
+
   // Run inference, and report any error
   TfLiteStatus invoke_status = interpreter->Invoke();
   if (invoke_status != kTfLiteOk) {

@@ -22,13 +22,13 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_log.h"
 #include <cstring>
 
-#include "MPU.hpp"        // main file, provides the class itself
-#include "mpu/math.hpp"   // math helper for dealing with MPU data
-#include "mpu/types.hpp"  // MPU data types and definitions
-#include "I2Cbus.hpp"
-
-#define I2C_MPU_SDA GPIO_NUM_5
-#define I2C_MPU_SCL GPIO_NUM_4
+// #include "MPU.hpp"        // main file, provides the class itself
+// #include "mpu/math.hpp"   // math helper for dealing with MPU data
+// #include "mpu/types.hpp"  // MPU data types and definitions
+// #include "I2Cbus.hpp"
+// 
+// #define I2C_MPU_SDA GPIO_NUM_5
+// #define I2C_MPU_SCL GPIO_NUM_4
 // ------------------ global variables ------------------
 extern int begin_index;
 
