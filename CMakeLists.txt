@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.16)
 
 # Tell ESP-IDF where to find extra components
 set(EXTRA_COMPONENT_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../esp-tflite-micro
+    $ENV{TFLITE_MICRO_PATH} # Add the esp-tflite-micro library as an esp component
 )
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
