@@ -18,4 +18,3 @@
     - more to be added...
 
 - [ ] Additional quality of life improvements
-

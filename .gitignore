@@ -1,1 +1,3 @@
-reference/
+/reference/
+/build/
+/managed_components/
