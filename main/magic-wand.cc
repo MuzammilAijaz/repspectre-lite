@@ -9,6 +9,7 @@
 #include "main_functions.h"
 
 #include "sensor_init.h"
+#include "bleSetup.h"
 
 void tf_main(void) {
   setup();
@@ -34,6 +35,11 @@ extern "C" void app_main() {
   
   while(init_done_flag != 2);
   // ---------------------------------------------
+
+  setupBLE();
+
+  // init_mpu();
+  vTaskDelay(pdMS_TO_TICKS(100));
 
   xTaskCreate((TaskFunction_t)&tf_main, "tensorflow", 16 * 1024, NULL, 8, NULL);
   vTaskDelete(NULL);
