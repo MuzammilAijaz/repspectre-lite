@@ -83,9 +83,9 @@ static void sensor_data_task(void *param) {
         // ESP_LOGI(TAG, "x: %f, y: %f, z: %f, w: %f", data.x, data.y, data.z, data.w);
 
         /* Send sensor data indication if enabled */
-        // send_sensor_data_indication();
+        send_sensor_data_indication();
 
-        send_sensor_data_notifications();
+        // send_sensor_data_notifications();
 
         /* Sleep */
         vTaskDelay(pdMS_TO_TICKS(2.5));
@@ -146,6 +146,6 @@ void setupBLE(void) {
 
     /* Start NimBLE host task thread and return */
     xTaskCreate(nimble_host_task, "NimBLE Host", 4*1024, NULL, 5, NULL); // runs the GAP for connection, GATT for client/server processing
-    // xTaskCreate(sensor_data_task, "Sensor Task", 24*1024, NULL, 5, NULL); // runs our GATT service
+    xTaskCreate(sensor_data_task, "Sensor Task", 24*1024, NULL, 5, NULL); // runs our GATT service
     return;
 }

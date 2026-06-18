@@ -25,6 +25,9 @@ limitations under the License.
 #include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
 // Globals, used for compatibility with Arduino-style sketches.
 namespace {
   const tflite::Model* model = nullptr;
@@ -117,7 +120,11 @@ void loop() {
   should_clear_buffer = false;
 
   // If there was no new data, wait until next time
-  if (!got_data) {printf("early exit");return;}
+  if (!got_data) {
+    printf("early exit");
+    vTaskDelay(pdMS_TO_TICKS(10));
+    return;
+  }
 
   // Run inference, and report any error
   TfLiteStatus invoke_status = interpreter->Invoke();

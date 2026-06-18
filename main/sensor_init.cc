@@ -1,5 +1,6 @@
 #include "sensor_init.h"
 #include "sensor_data.h" // to allow access and initialize mpu object
+#include "driver/gpio.h"
 
 #define PIN_SDA 5
 #define PIN_CLK 4
