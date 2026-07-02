@@ -34,7 +34,7 @@ THE SOFTWARE.
 #ifndef _I2CDEV_H_
 #define _I2CDEV_H_
 
-#include <driver/i2c.h>
+#include <driver/i2c_master.h>
 
 #define I2C_SDA_PORT gpioPortA
 #define I2C_SDA_PIN 0

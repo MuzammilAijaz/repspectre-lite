@@ -1,11 +1,13 @@
 #include "sensor_init.h"
 #include "sensor_data.h" // to allow access and initialize mpu object
+#include "driver/gpio.h"
 
 #define PIN_SDA 5
 #define PIN_CLK 4
 
 int init_done_flag = 0; // tells the main.cc to wait untill setup is done before proceeding with other tasks
 MPU6050 mpu;
+i2c_master_bus_handle_t i2c_bus = NULL;
 void errorLoopBlink();
 
 // =====================================================================================
@@ -13,16 +15,17 @@ void errorLoopBlink();
 // -------------------------------------------------------------------------------------
 
 void init_i2c(void *ignore) {
-    i2c_config_t conf = {}; // initialize to 0/null, important in cpp
-    conf.mode = I2C_MODE_MASTER;
+    i2c_master_bus_config_t conf = {}; // initialize to 0/null, important in cpp
+    conf.i2c_port = I2C_NUM_0;
     conf.sda_io_num = (gpio_num_t)PIN_SDA;
     conf.scl_io_num = (gpio_num_t)PIN_CLK;
-    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.master.clk_speed = 400000;
-    conf.clk_flags = 0;              // <---- important for ESP-IDF v5+
-    ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &conf));
-    ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0));
+    conf.clk_source = I2C_CLK_SRC_DEFAULT;
+    conf.glitch_ignore_cnt = 7;
+    conf.flags.enable_internal_pullup = true;
+
+    i2c_master_bus_handle_t bus_handle;
+    ESP_ERROR_CHECK(i2c_new_master_bus(&conf, &bus_handle));
+    i2c_bus = bus_handle;
 
     // vAFunction();
     init_done_flag = 1;
