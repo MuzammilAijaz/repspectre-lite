@@ -76,19 +76,18 @@ static void sensor_data_task(void *param) {
         // ------------------ Debugging ------------------
         // UBaseType_t freeStack = uxTaskGetStackHighWaterMark(NULL);
         // ESP_LOGI(TAG, "Free stack remaining: %u bytes", freeStack * sizeof(StackType_t));
-        // ---------------------------------------------      
  
-        /* Read sensor data value every 1 second */
-        SensorData data = get_sensor_data(SensorValue::QUATERNION);
+        // SensorData data = get_sensor_data(SensorValue::QUATERNION);
         // ESP_LOGI(TAG, "x: %f, y: %f, z: %f, w: %f", data.x, data.y, data.z, data.w);
+        // ---------------------------------------------
 
-        /* Send sensor data indication if enabled */
-        // send_sensor_data_indication();
-
+        /* Send sensor data indication/notification ONLY if enabled */
+        // RESEARCH: why am i sending both?
+        send_sensor_data_indication();
         send_sensor_data_notifications();
 
         /* Sleep */
-        vTaskDelay(pdMS_TO_TICKS(2.5));
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 
     /* Clean up at exit */

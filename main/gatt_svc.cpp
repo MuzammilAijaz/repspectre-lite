@@ -197,17 +197,39 @@ error:
 // ================== Sensor Data Update Logic ==================
 void send_sensor_data_indication(void) {
     if (sensor_data_ind_status && sensor_data_chr_conn_handle_inited) {
-        ble_gatts_indicate(sensor_data_chr_conn_handle,
-                           sensor_data_chr_val_handle);
-        // ESP_LOGI(TAG, "Sensor data indication sent!");
+        // Refresh your local struct data from your MPU6050 handler
+        // HACK:
+        sensor_data_chr_val = get_sensor_data(SensorValue::QUATERNION);
+
+        // ESP_LOGI("BLE_GATT", "SENSOR: %f", sensor_data_chr_val.x);
+
+        // Allocate an mbuf from the NimBLE pool and flatten struct
+        struct os_mbuf *om = ble_hs_mbuf_from_flat(&sensor_data_chr_val, sizeof(sensor_data_chr_val));
+        if (om != NULL) {
+            // Fire the indication with the flat data block
+            ble_gatts_indicate_custom(sensor_data_chr_conn_handle, sensor_data_chr_val_handle, om);
+        } else {
+            ESP_LOGE("BLE_GATT", "Failed to allocate mbuf for indication");
+        }
     }
 }
 
 void send_sensor_data_notifications(void) {
     if (sensor_data_notify_status && sensor_data_chr_conn_handle_inited) {
-        ble_gatts_notify(sensor_data_chr_conn_handle,
-                           sensor_data_chr_val_handle);
-        // ESP_LOGI(TAG, "Sensor data NOTIFICATION");
+        // Refresh your local struct data from your MPU6050 handler
+        // HACK:
+        sensor_data_chr_val = get_sensor_data(SensorValue::QUATERNION);
+
+        // ESP_LOGI("BLE_GATT", "SENSOR: %f", sensor_data_chr_val.x);
+
+        // Allocate an mbuf from the NimBLE pool and flatten struct
+        struct os_mbuf *om = ble_hs_mbuf_from_flat(&sensor_data_chr_val, sizeof(sensor_data_chr_val));
+        if (om != NULL) {
+            // Fire the notification with the flat data block
+            ble_gatts_notify_custom(sensor_data_chr_conn_handle, sensor_data_chr_val_handle, om);
+        } else {
+            ESP_LOGE("BLE_GATT", "Failed to allocate mbuf for notification");
+        }
     }
 }
 
