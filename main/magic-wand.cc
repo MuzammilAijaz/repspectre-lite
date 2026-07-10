@@ -34,8 +34,9 @@ extern "C" void app_main() {
   while(init_done_flag !=1);
   vTaskDelay(pdMS_TO_TICKS(200));
 
-  // init ssd1307
-  xTaskCreate(init_display_u8g2, "screen_init_task", 1024 * 3, NULL, 6, NULL);
+  // init ssd1307 UI task
+  ui_init();
+  xTaskCreate(ui_task, "screen_ui_task", 1024 * 4, NULL, 6, NULL);
   vTaskDelay(pdMS_TO_TICKS(200));
 
   // init mpu6050

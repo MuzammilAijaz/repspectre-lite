@@ -195,10 +195,12 @@ SensorData get_sensor_data(SensorValue val) {
           break;
       case SensorValue::QUATERNION:
           data = getQuaternion();
+          // printf("Quaternion: %f, %f, %f, %f", data.w, data.x, data.y, data.z);
           break;
       default:
           break;
       };
+
 
     return data;
 }

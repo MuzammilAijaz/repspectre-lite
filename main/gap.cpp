@@ -7,6 +7,7 @@
 #include "gap.h"
 #include "common.h"
 #include "gatt_svc.h"
+#include "screen.h"
 
 /* Private function declarations */
 inline static void format_addr(char *addr_str, uint8_t addr[]);
@@ -151,6 +152,7 @@ static int gap_event_handler(struct ble_gap_event *event, void *arg) {
 
         /* Connection succeeded */
         if (event->connect.status == 0) {
+            ui_post_event(UI_EVT_BT_CONNECTED);
             /* Check connection handle */
             rc = ble_gap_conn_find(event->connect.conn_handle, &desc);
             if (rc != 0) {
@@ -180,6 +182,7 @@ static int gap_event_handler(struct ble_gap_event *event, void *arg) {
         }
         /* Connection failed, restart advertising */
         else {
+            ui_post_event(UI_EVT_BT_DISCONNECTED);
             start_advertising();
         }
         return rc;
@@ -191,6 +194,7 @@ static int gap_event_handler(struct ble_gap_event *event, void *arg) {
                  event->disconnect.reason);
 
         /* Restart advertising */
+        ui_post_event(UI_EVT_BT_DISCONNECTED);
         start_advertising();
         return rc;
 
